@@ -1,0 +1,4 @@
+iPython
+pandas
+numpy
+pygraphviz
