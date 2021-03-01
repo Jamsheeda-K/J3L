@@ -2,3 +2,4 @@ iPython
 pandas
 numpy
 pygraphviz
+matplotlib
