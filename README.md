@@ -10,3 +10,5 @@ Extra:
 - fill the shelves of a supermarket image
 - clean up your code
 
+Project on krspiced : 
+http://krspiced.pythonanywhere.com/chapters/project_markov/README.html
