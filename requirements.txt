@@ -4,3 +4,4 @@ numpy
 pygraphviz
 matplotlib
 tqdm
+pillow
