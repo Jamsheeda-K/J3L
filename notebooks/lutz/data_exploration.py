@@ -25,6 +25,9 @@ for filename in all_files:
 frame = pd.concat(li, axis=0, ignore_index=True)
 frame = frame.set_index('timestamp')
 
+# save create dataframe
+frame.to_csv('/Users/Lutz/Desktop/spiced_projects/discrete-dill-student-code/J3L/data/supermarket.csv')
+
 print(frame.shape)
 print(frame.head())
 print(f'all data : {frame}')
