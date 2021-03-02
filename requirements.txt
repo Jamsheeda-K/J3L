@@ -2,3 +2,5 @@ iPython
 pandas
 numpy
 pygraphviz
+matplotlib
+tqdm
