@@ -162,7 +162,7 @@ class SuperMarket:
         return None
 
 if(__name__=='__main__'):
-    doodl = SuperMarket('img',7,22)
+    doodl = SuperMarket('img', 9, 17)
 
     fig = plt.gcf()
     fig.show()
@@ -177,3 +177,6 @@ if(__name__=='__main__'):
         #print(doodl)
         #if(doodl.minutes % 5 == 0):
         doodl.show_customers()
+
+doodl.append_state_to_file('simulation.csv')
+print(f'Supermarkt earned {doodl.income}')
