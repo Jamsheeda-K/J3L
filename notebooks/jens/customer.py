@@ -2,14 +2,17 @@ import pandas as pd
 import numpy as np
 import random
 
+
 class Customer:
     """a single customer that moves through the supermarket in a MCMC simulation"""
 
-    def __init__(self, id, transition_mat):
+    def __init__(self, id, transition_mat, revenue):
         self.id = id
         self.state = 'in'
         self.transition_mat = transition_mat
+        self.revenue  = revenue
         self.count = 0
+        self.cost = 0
 
     def __repr__(self):
         """
@@ -35,6 +38,7 @@ class Customer:
         nstate = random.choices(self.transition_mat.columns, row)
         self.state = nstate[0]
         self.count += 1
+        self.cost += self.revenue.get(self.state, 0)
 
 if(__name__=='__main__'):
     df_transition = pd.read_csv('data/freq_table.csv', index_col=0)

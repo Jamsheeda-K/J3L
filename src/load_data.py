@@ -10,7 +10,7 @@ def load_supermarket_data(data_dir):
     "read shop data from folder 'data_dir' into one pandas dataframe"
     dfs = []
     for x in os.listdir(data_dir):
-        if(x=='os.listdir(data_dir)'):
+        if(x=='freq_table.csv' | x=='supermarket.csv'): 
             continue
         df = pd.read_csv(data_dir + '/' + x, sep=';', parse_dates=True, infer_datetime_format=True)
         dfs.append(df)
