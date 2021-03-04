@@ -13,6 +13,8 @@ class Customer:
         self.revenue  = revenue
         self.count = 0
         self.cost = 0
+        self.x = 11
+        self.y = 14
 
     def __repr__(self):
         """
