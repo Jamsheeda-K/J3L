@@ -24,9 +24,10 @@ for filename in all_files:
 
 frame = pd.concat(li, axis=0, ignore_index=True)
 frame = frame.set_index('timestamp')
+frame = frame.sort_values('timestamp', ascending=True)
 
 # save create dataframe
-frame.to_csv('/Users/Lutz/Desktop/spiced_projects/discrete-dill-student-code/J3L/data/supermarket.csv')
+frame.to_csv('/Users/Lutz/Desktop/spiced_projects/discrete-dill-student-code/J3L/notebooks/lutz/supermarket.csv')
 
 print(frame.shape)
 print(frame.head())
@@ -55,12 +56,10 @@ frame_checkout['customer_no'].resample('1H').count().plot(figsize=(15,6))
 plt.show()
 
 # Calculate the time each customer spent in the market
-frame_cust_min = frame.reset_index().groupby(['day', 'customer_no'])['timestamp'].min()
-frame_cust_max = frame.reset_index().groupby(['day', 'customer_no'])['timestamp'].max()
-#frame_cust_spent = frame_cust_max['timestamp']- frame_cust_min['timestamp']
-#[frame['day'] == 'Monday'].groupby('customer_no').min()
-
-# missing calculation of time spent
+frame_min = frame.groupby(['day','customer_no'],as_index=False)['timestamp'].min()
+frame_max = frame.groupby(['day','customer_no'],as_index=False)['timestamp'].max()
+frame_time_market = frame_max['timestamp']-frame_min['timestamp']
+print(f'frame_time_market
 
 # Calculate the total number of customers in the supermarket over time.
 frame_all_cust = frame.drop_duplicates(['customer_no'])
