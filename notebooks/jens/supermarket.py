@@ -28,7 +28,7 @@ revenue =  {'dairy': 5, 'spices':3, 'fruit': 4, 'drinks':6}
 proba = 0.8
 
 class SuperMarket:
-    def __init__(self, data_dir, opening, closing):
+    def __init__(self, data_dir, opening, closing, astar):
         """
         contruct a supermarket with image files in data_dir
         opening and closing hours are integer (0..23)
@@ -42,6 +42,7 @@ class SuperMarket:
         self.icons = np.array(im3)
         self.opening = opening
         self.closing = closing
+        self.do_astar = astar
         self.minutes = 0
         self.customers = []
         self.nextid = 0
@@ -148,14 +149,16 @@ class SuperMarket:
             places.append([customer.x,customer.y])
             icons.append([0,0])
         if(len(self.customers)>0):
-            #self.sliding_compose(oldplaces, places, icons)
-            self.astar_compose(oldplaces, places, icons)
+            if(self.do_astar==1):
+                self.astar_compose(oldplaces, places, icons)
+            else:
+                self.sliding_compose(oldplaces, places, icons)
             time.sleep(0.5)
         #self.compose(places, icons)
         #self.show()
 
     def fill_shelves(self):
-        "brings icons to the places where the objects are"
+        "brings icons to the places where the objects are, randomly leaves some shelves empty"
         places = []
         icons = []
         for place_shop, place_icon in zip(positions.values(), icon_positions):
@@ -218,18 +221,22 @@ class SuperMarket:
         else:
             mode = 'a'
         with open(fn, mode)  as fp:
+            if(self.minutes==0):
+                fp.write('time;customer;location\n')
             for customer in self.customers:
                 fp.write(f'{self.get_time()};{customer.id};{customer.state}\n')
         return None
 
 if(__name__=='__main__'):
     parser = argparse.ArgumentParser(description='Supermarket simulator')
-    parser.add_argument('-g', '--grafic', help='with graphics ',
+    parser.add_argument('-g', '--grafic', help='with graphics',
+                        type=int, default = 1, choices=[0,1])
+    parser.add_argument('-a', '--astar', help='uses A* algorithm for moving customers',
                         type=int, default = 1, choices=[0,1])
     args = parser.parse_args()
 
-
-    doodl = SuperMarket('.', 9, 17)
+    outfile = 'simulation.csv'
+    doodl = SuperMarket('.', 9, 17, args.astar)
 
     if(args.grafic):
         fig = plt.gcf()
@@ -241,7 +248,7 @@ if(__name__=='__main__'):
     doodl.fill_shelves()
     try:
         while (doodl.is_open()):
-            doodl.append_state_to_file('simulation.csv')
+            doodl.append_state_to_file(outfile)
             doodl.next_minute()
             doodl.remove_exitsting_customers()
             doodl.add_new_customers()
@@ -252,5 +259,5 @@ if(__name__=='__main__'):
     except KeyboardInterrupt as ex:
         print('Supmarket close due to illness!')
         #raise ex
-doodl.append_state_to_file('simulation.csv')
+doodl.append_state_to_file(outfile)
 print(f'Supermarkt earned {doodl.income}')
