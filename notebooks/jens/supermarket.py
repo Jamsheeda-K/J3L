@@ -7,6 +7,7 @@ from customer import Customer
 from copy import copy
 import time
 import argparse
+from a_star_adapted import A_star_supermarket
 
 try:
     import vlc
@@ -47,6 +48,7 @@ class SuperMarket:
         self.transition = pd.read_csv(data_dir+'/data/freq_table.csv', index_col=0)
         self.income = 0
         self.audio = '/home/jkrause/Downloads/kasse.mp3'
+        self.astar = A_star_supermarket()
 
     def show(self):
         "show the scene in matplotlig window"
@@ -89,6 +91,7 @@ class SuperMarket:
         for place,tile in zip(places ,tiles):
             item = self.get_icon(tile)
             self.set_tile(item, place)
+        return None
 
     def sliding_compose(self, oldplaces, places, tiles):
         "slowly move costomer to new location"
@@ -101,6 +104,26 @@ class SuperMarket:
             self.compose(new_places, tiles)
             self.show()
             #time.sleep(0.2)
+        return None
+ 
+    def astar_compose(self, oldplaces, places, tiles):
+        "move costomers to new location using a* algorithm"
+        path_lst = []
+        for s,f in zip(oldplaces, places):
+            p = self.astar.find_path(s,f)
+            path_lst.append(p)
+            
+        max_len = np.max([len(p) for p in path_lst])
+        #print(f'max path = {max_len}')
+        for i in range(max_len):
+            new_places = []
+            for p in path_lst:
+                if i<len(p):
+                    new_places.append(p[i])
+                else:
+                    new_places.append(p[-1])
+            self.compose(new_places, tiles)
+            self.show()
         return None
 
     def show_customers(self):
@@ -125,8 +148,9 @@ class SuperMarket:
             places.append([customer.x,customer.y])
             icons.append([0,0])
         if(len(self.customers)>0):
-            self.sliding_compose(oldplaces, places, icons)
-            time.sleep(0.2)
+            #self.sliding_compose(oldplaces, places, icons)
+            self.astar_compose(oldplaces, places, icons)
+            time.sleep(0.5)
         #self.compose(places, icons)
         #self.show()
 
@@ -225,7 +249,8 @@ if(__name__=='__main__'):
             #if(doodl.minutes % 5 == 0):
             if(args.grafic):
                 doodl.show_customers()
-    except KeyboardInterrupt:
+    except KeyboardInterrupt as ex:
         print('Supmarket close due to illness!')
+        #raise ex
 doodl.append_state_to_file('simulation.csv')
 print(f'Supermarkt earned {doodl.income}')
