@@ -1,6 +1,32 @@
+"""
+Spiced Academy creat a Monte Carlo Markov Chain Simulation
+
+Write a Customer class that represents a single customer in the supermarket.
+Uses a transition probability matrix to simulate the journey of a single customer through the market. 
+Use a Markov model to represent the state of a customer. 
+Use one-minute time intervals for the transitions.
+Once a customer reaches the checkout, consider them churned – do not simulate them any longer.
+As attributes, the class should take in an id, a transition probability matrix 
+(which you extracted earlier from the Data Analysis section) and an initial state:
+
+https://github.com/DanielaMorariu1990/Supermarket_MCMC_simulation/blob/main/supermarket_simulation.py
+
+"""
+import time
+import datetime
+
 import numpy as np
 import pandas as pd
-import random
+import cv2
+
+from astar_python.astar import Astar
+#from customer_simulation import Customer, dest
+#from animation_template import SupermarketMap, MARKET
+
+
+transition_matrix = pd.read_csv("transition_matrix.csv")
+transition_matrix.set_index("location", inplace=True)
+tiles = cv2.imread('tiles.png')
 
 class Customer:
     """a single customer that can be moved from one state to another"""
@@ -26,12 +52,15 @@ class Supermarket:
     """manages multiple Customer instances that are currently in the market.
     """
 
-    def __init__(self):        
+    def __init__(self, market):        
         # a list of Customer objects
-        self.customers = []
-        self.minutes = 0
-        self.last_id = 0
-
+        self.customers = [] # here we nee the customer class
+        self.minutes = 0 #how many minutes have passed?
+        self.id_suffix = 0 # we can concatenate it with the id from customer
+        self.possible_states = 5 #or list of locations?
+        self.market = market # current supermarket
+        self.current_time = 0
+        self.to_move = False
     def __repr__(self):
         return f'{self.get_time()}: Supermarket with {len(self.customers)} customers.'
 
@@ -47,6 +76,8 @@ class Supermarket:
     def print_customers(self):
         """print all customers with the current time and id in CSV format.
         """
+        self.current_time = self.get_time()
+        return f'Supermarket("{self.customers}", "{self.current_time}")'
 
     def next_minute(self):
         """propagates all customers to the next state.
@@ -64,13 +95,28 @@ class Supermarket:
         return self.minutes < 60*(closing_hour - opening_hour)
 
     
-    def add_new_customers(self):
+    def add_new_customers(self, stop, id_suffix, terrain_map, image, x, y):
         """randomly creates new customers.
         """
+        for i in range(stop):
+            cust = Customer(str(i) + "_" + str(id_suffix), "entrance", transition_matrix,
+                            terrain_map=terrain_map, image=image, x=x, y=y)
+            self.customers.append(cust)
 
-    def remove_exitsting_customers(self):
+        self.id_suffix += 1
+
+    def remove_existing_customers(self):
         """removes every customer that is not active any more.
         """
+        # remove the customers which are not active (.is_active )
+        self.to_move = False
+        for cust in self.customers:
+            if cust.state == 'checkout':
+                self.customers.remove(cust)
+                print(f'{cust} removed')
+
+            if cust.to_move():
+                self.to_move = True
 
 # start a simulation
 if __name__ == '__main__':

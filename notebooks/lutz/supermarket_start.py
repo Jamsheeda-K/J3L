@@ -61,8 +61,6 @@ if __name__ == '__main__':
     # this code executed when we run the file python supermarket.py
     lidl = Supermarket()
     print(lidl)
-
-
     lidl.next_minute()
 
 
