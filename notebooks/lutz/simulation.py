@@ -14,7 +14,7 @@ https://github.com/DanielaMorariu1990/Supermarket_MCMC_simulation/blob/main/supe
 """
 import time
 import datetime
-
+import random
 import numpy as np
 import pandas as pd
 import cv2
@@ -54,13 +54,17 @@ class Supermarket:
 
     def __init__(self, market):        
         # a list of Customer objects
-        self.customers = [] # here we nee the customer class
+        self.customers = [] # here we need the customer class
         self.minutes = 0 #how many minutes have passed?
         self.id_suffix = 0 # we can concatenate it with the id from customer
         self.possible_states = 5 #or list of locations?
         self.market = market # current supermarket
+        self.matrix = pd.read_csv('trans_matrix.csv',index_col=0)
         self.current_time = 0
-        self.to_move = False
+        self.is_open = 
+
+    
+    
     def __repr__(self):
         return f'{self.get_time()}: Supermarket with {len(self.customers)} customers.'
 
@@ -95,15 +99,18 @@ class Supermarket:
         return self.minutes < 60*(closing_hour - opening_hour)
 
     
-    def add_new_customers(self, stop, id_suffix, terrain_map, image, x, y):
+    def add_new_customers(self): #stop, id_suffix
         """randomly creates new customers.
         """
-        for i in range(stop):
-            cust = Customer(str(i) + "_" + str(id_suffix), "entrance", transition_matrix,
-                            terrain_map=terrain_map, image=image, x=x, y=y)
-            self.customers.append(cust)
+        while(len(self.customers)<10) &(self.minutes < 60*(self.closing_hour-self.opening_hour)-5):
+            self.customers.append(Customer(self.last_id))
+            self.last_id += 1
+        # for i in range(stop):
+        #     cust = Customer(str(i) + "_" + str(id_suffix), "entrance", transition_matrix,
+        #                     )
+        #     self.customers.append(cust)
 
-        self.id_suffix += 1
+        # self.id_suffix += 1
 
     def remove_existing_customers(self):
         """removes every customer that is not active any more.
@@ -121,16 +128,17 @@ class Supermarket:
 # start a simulation
 if __name__ == '__main__':
     # this code only runs when we run the file with 'python supermarket.py'
-    lidl = Supermarket()
-    # cust1 = Customer(1, 'drinks')
-    # cust1.next_state()
+    cust1 = Customer(1, 'drinks')
+    #cust1.next_state()
+    lidl = Supermarket(cust1)
+    
 
     while lidl.is_open():
         # move on to the next minute
         lidl.next_minute()
 
         # remove churned customers from the supermarket
-        lidl.remove_exitsting_customers()
+        lidl.remove_existing_customers()
 
         # generate new customers at their initial location
         lidl.add_new_customers()
