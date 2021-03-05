@@ -47,7 +47,7 @@ class Supermarket:
         self.opening_hour = opening_hour
         self.closing_hour = closing_hour
         # writing the initial state to a csv file 
-        with open('oneday.csv','w') as outfile:
+        with open('twoday.csv','w') as outfile:
             outfile.write('timestamp;customer_no;location\n')
             for i in range(len(self.customers)):
                 outfile.write(f'{self.opening_hour:02d}:00:00;{self.customers[i].id};{self.customers[i].state[0]}\n')
@@ -69,7 +69,7 @@ class Supermarket:
         output = ''
         for i in range(len(self.customers)):
             output += f'Customer no. {self.customers[i].id} is in {self.customers[i].state[0]} section\n'
-        print(output)
+        #print(output)
         with open('oneday.csv','a') as outfile:
             for i in range(len(self.customers)):
                 outfile.write(f'{self.get_time()};{self.customers[i].id};{self.customers[i].state[0]}\n')
@@ -91,7 +91,7 @@ class Supermarket:
     def add_new_customers(self):
         """randomly creates new customers.
         """
-        while(len(self.customers)<10) &(self.minutes < 60*(self.closing_hour-self.opening_hour)-5):
+        while(len(self.customers)<10) &(self.minutes < 60*(self.closing_hour-self.opening_hour)-10):
             self.customers.append(Customer(self.last_id))
             self.last_id += 1
 
@@ -114,7 +114,7 @@ if __name__=='__main__':
     #print(lidl)
     while lidl.is_open():
         print(lidl)
-        #lidl.print_customers()
+        lidl.print_customers()
         #move to next minute
         lidl.next_minute()
         lidl.print_customers()
