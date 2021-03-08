@@ -1,26 +1,25 @@
-import pandas as pd
-import numpy as np
+"customer in MCMC supermarket simulation"
 import random
-
+import pandas as pd
 
 class Customer:
     """a single customer that moves through the supermarket in a MCMC simulation"""
 
-    def __init__(self, id, transition_mat, revenue):
-        self.id = id
+    def __init__(self, cid, transition_mat, revenue):
+        self.cust_id = cid
         self.state = 'in'
         self.transition_mat = transition_mat
         self.revenue  = revenue
         self.count = 0
         self.cost = 0
-        self.x = 11
-        self.y = 14
+        self.pos_x = 11
+        self.pos_y = 14
 
     def __repr__(self):
         """
         Returns a csv string for that customer.
         """
-        return f'{self.id}:{self.state}'
+        return f'{self.cust_id}:{self.state}'
 
     def is_active(self):
         """
@@ -42,12 +41,12 @@ class Customer:
         self.count += 1
         self.cost += self.revenue.get(self.state, 0)
 
-if(__name__=='__main__'):
+if __name__=='__main__':
     df_transition = pd.read_csv('data/freq_table.csv', index_col=0)
     #print(df_transition)
     for i in range(12):
-        p1 = Customer(i,df_transition)
+        p1 = Customer(i,df_transition, {})
         print(p1)
-        while(p1.is_active()):
+        while p1.is_active():
             p1.next_state()
             print(p1)

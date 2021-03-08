@@ -19,13 +19,13 @@ import numpy as np
 import pandas as pd
 import cv2
 
-from astar_python.astar import Astar
+#from astar_python.astar import Astar
 #from customer_simulation import Customer, dest
 #from animation_template import SupermarketMap, MARKET
 
 
-transition_matrix = pd.read_csv("transition_matrix.csv")
-transition_matrix.set_index("location", inplace=True)
+transition_matrix = pd.read_csv("transition_matrix.csv", index_col=0)
+#transition_matrix.set_index("location", inplace=True)
 tiles = cv2.imread('tiles.png')
 
 class Customer:
@@ -35,14 +35,19 @@ class Customer:
         self.id = id
         self.state = initial_state
         #self.budget = budget
-        self.matrix = pd.read_csv('trans_matrix.csv',index_col=0)
+        self.matrix = transition_matrix #pd.read_csv('transi_matrix.csv',index_col=0)
     
 
     def __repr__(self):
         return f'<Customer {self.id} in {self.state}>'
 
     def next_state(self):
-        self.state = random.choice(['spices', 'drinks', 'fruit'])
+        #print(self.matrix.loc[self.state].to_numpy())
+        #self.state = random.choice(['spices', 'drinks', 'fruit', 'dairy','checkout'])
+        self.state = random.choices(
+            self.matrix.columns,#['entrance','dairy','drinks','fruit','spices','checkout'],
+            self.matrix.loc[self.state].to_numpy().T
+        )[0]
 
     def is_active(self):
         pass
@@ -59,10 +64,10 @@ class Supermarket:
         self.id_suffix = 0 # we can concatenate it with the id from customer
         self.possible_states = 5 #or list of locations?
         self.market = market # current supermarket
-        self.matrix = pd.read_csv('trans_matrix.csv',index_col=0)
+        self.matrix = transition_matrix #pd.read_csv('trans_matrix.csv',index_col=0)
         self.current_time = 0
-        self.is_open = 
-
+        self.opening_hour = 7
+        self.closing_hour = 22
     
     
     def __repr__(self):
@@ -93,18 +98,18 @@ class Supermarket:
             customer.next_state()
 
     def is_open(self):
-        closing_hour = 8
-        opening_hour = 7
+        #closing_hour = 8
+        #opening_hour = 7
         # self.get_time() != "21:00"
-        return self.minutes < 60*(closing_hour - opening_hour)
+        return self.minutes < 60*(self.closing_hour - self.opening_hour)
 
     
     def add_new_customers(self): #stop, id_suffix
         """randomly creates new customers.
         """
         while(len(self.customers)<10) &(self.minutes < 60*(self.closing_hour-self.opening_hour)-5):
-            self.customers.append(Customer(self.last_id))
-            self.last_id += 1
+            self.customers.append(Customer(self.id_suffix, 'entrance'))
+            self.id_suffix += 1
         # for i in range(stop):
         #     cust = Customer(str(i) + "_" + str(id_suffix), "entrance", transition_matrix,
         #                     )
@@ -117,13 +122,11 @@ class Supermarket:
         """
         # remove the customers which are not active (.is_active )
         self.to_move = False
-        for cust in self.customers:
-            if cust.state == 'checkout':
-                self.customers.remove(cust)
-                print(f'{cust} removed')
-
-            if cust.to_move():
-                self.to_move = True
+        #for cust in self.customers:
+        #    print(cust.state)
+        self.customers = [cust for cust in self.customers if cust.state != 'checkout']
+            #if cust.to_move():
+            #    self.to_move = True
 
 # start a simulation
 if __name__ == '__main__':
@@ -144,5 +147,6 @@ if __name__ == '__main__':
         lidl.add_new_customers()
 
         # repeat from step 1
-        print(lidl)
-
+        #print(lidl)
+        print(lidl.print_customers())
+        time.sleep(2)
